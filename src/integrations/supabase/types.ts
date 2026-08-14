@@ -14,7 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      generated_drafts: {
+        Row: {
+          account_id: string
+          body: string
+          created_at: string
+          gmail_draft_id: string | null
+          id: string
+          message_id: string
+          subject: string | null
+          thread_id: string | null
+          to_email: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          body: string
+          created_at?: string
+          gmail_draft_id?: string | null
+          id?: string
+          message_id: string
+          subject?: string | null
+          thread_id?: string | null
+          to_email?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          body?: string
+          created_at?: string
+          gmail_draft_id?: string | null
+          id?: string
+          message_id?: string
+          subject?: string | null
+          thread_id?: string | null
+          to_email?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_drafts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "gmail_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gmail_accounts: {
+        Row: {
+          access_token: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          refresh_token: string | null
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          refresh_token?: string | null
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          refresh_token?: string | null
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
