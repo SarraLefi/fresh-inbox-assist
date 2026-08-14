@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Loader2, RefreshCw, Copy, Check, Save, Sparkles, LogOut, Inbox } from "lucide-react";
+import { Loader2, RefreshCw, Copy, Check, Send, Sparkles, LogOut, Inbox } from "lucide-react";
 import { toast } from "sonner";
 
 import { listInbox, generateReply, sendGmailReply, signOut } from "@/lib/gmail.functions";
