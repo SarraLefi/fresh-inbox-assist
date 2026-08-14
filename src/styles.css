@@ -59,18 +59,30 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-action: var(--action);
+  --color-action-foreground: var(--action-foreground);
+  --color-auto: var(--auto);
+  --color-auto-foreground: var(--auto-foreground);
+  --color-surface: var(--surface);
+  --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --shadow-card: 0 1px 2px oklch(0.2 0.03 250 / 0.06), 0 8px 24px oklch(0.2 0.03 250 / 0.05);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --background: oklch(0.98 0.005 240);
+  --surface: oklch(1 0 0);
+  --foreground: oklch(0.21 0.03 250);
+  --action: oklch(0.72 0.16 62);
+  --action-foreground: oklch(0.25 0.06 60);
+  --auto: oklch(0.93 0.01 250);
+  --auto-foreground: oklch(0.48 0.03 250);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.48 0.11 225);
+  --primary-foreground: oklch(0.99 0.005 240);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
@@ -99,6 +111,11 @@
 
 .dark {
   --background: oklch(0.129 0.042 264.695);
+  --surface: oklch(0.208 0.042 265.755);
+  --action: oklch(0.65 0.15 62);
+  --action-foreground: oklch(0.16 0.03 60);
+  --auto: oklch(0.28 0.03 250);
+  --auto-foreground: oklch(0.75 0.02 250);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
   --card-foreground: oklch(0.984 0.003 247.858);
@@ -138,6 +155,7 @@
   }
 
   body {
+    font-family: var(--font-sans);
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
