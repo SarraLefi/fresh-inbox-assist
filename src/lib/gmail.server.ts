@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 // In development, attempt to load a local .env so process.env values are available
 // when running `npm run dev` from the project root. This makes it easier to
 // test OAuth locally without having to export env vars in the shell.
-if (process.env.NODE_ENV !== "production" && !process.env["GOOGLE_OAUTH_CLIENT_ID"]) {
+if (process.env["NODE_ENV"] !== "production" && !process.env["GOOGLE_OAUTH_CLIENT_ID"]) {
   try {
     // dynamic import so this only runs in dev and doesn't affect production bundles
     // top-level await is supported in the dev environment used by Vite.

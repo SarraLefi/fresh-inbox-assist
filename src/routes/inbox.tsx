@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { listInbox, generateReply, sendGmailReply, signOut, getWritingSamples } from "@/lib/gmail.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import Chatbot from "@/components/chatbot";
 
 export const Route = createFileRoute("/inbox")({
   ssr: false,
@@ -145,6 +146,7 @@ function InboxPage() {
             <EmailCard key={email.id} email={email} />
           ))}
         </ul>
+        <Chatbot />
       </main>
     </div>
   );
