@@ -246,7 +246,7 @@ function encodeRaw(input: string) {
 
 export async function createGmailDraft(
   account: GmailAccount,
-  params: { to: string; subject: string; body: string; threadId?: string },
+  params: { to: string; subject: string; body: string; threadId?: string | undefined },
 ) {
   const subject = params.subject.toLowerCase().startsWith("re:")
     ? params.subject
@@ -272,11 +272,11 @@ export async function createGmailDraft(
 export async function storeDraft(params: {
   accountId: string;
   messageId: string;
-  threadId?: string;
-  subject?: string;
-  toEmail?: string;
+  threadId?: string | undefined;
+  subject?: string | undefined;
+  toEmail?: string | undefined;
   body: string;
-  gmailDraftId?: string;
+  gmailDraftId?: string | undefined;
 }) {
   const db = admin();
   const { error } = await db.from("generated_drafts").upsert(
