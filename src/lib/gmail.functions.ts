@@ -72,7 +72,7 @@ export const generateReply = createServerFn({ method: "POST" })
     return { reply };
   });
 
-export const saveGmailDraft = createServerFn({ method: "POST" })
+export const sendGmailReply = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -85,10 +85,10 @@ export const saveGmailDraft = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    const { getAccount, createGmailDraft, storeDraft } = await import("./gmail.server");
+    const { getAccount, sendGmailMessage, storeDraft } = await import("./gmail.server");
     const account = await getAccount(readSessionId());
     if (!account) throw new Error("Non connecté à Gmail");
-    const draftId = await createGmailDraft(account, {
+    const sentId = await sendGmailMessage(account, {
       to: data.toEmail,
       subject: data.subject,
       body: data.body,
@@ -101,7 +101,7 @@ export const saveGmailDraft = createServerFn({ method: "POST" })
       subject: data.subject,
       toEmail: data.toEmail,
       body: data.body,
-      gmailDraftId: draftId,
+      gmailDraftId: sentId,
     });
-    return { draftId };
+    return { sentId };
   });
