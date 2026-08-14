@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InboxRouteImport } from './routes/inbox'
+import { Route as MyStyleRouteImport } from './routes/my-style'
 import { Route as ApiPublicGoogleCallbackRouteImport } from './routes/api/public/google-callback'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const InboxRoute = InboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyStyleRoute = MyStyleRouteImport.update({
+  id: '/my-style',
+  path: '/my-style',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicGoogleCallbackRoute = ApiPublicGoogleCallbackRouteImport.update({
   id: '/api/public/google-callback',
   path: '/api/public/google-callback',
@@ -32,30 +38,34 @@ const ApiPublicGoogleCallbackRoute = ApiPublicGoogleCallbackRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/inbox': typeof InboxRoute
+  '/my-style': typeof MyStyleRoute
   '/api/public/google-callback': typeof ApiPublicGoogleCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/inbox': typeof InboxRoute
+  '/my-style': typeof MyStyleRoute
   '/api/public/google-callback': typeof ApiPublicGoogleCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/inbox': typeof InboxRoute
+  '/my-style': typeof MyStyleRoute
   '/api/public/google-callback': typeof ApiPublicGoogleCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/inbox' | '/api/public/google-callback'
+  fullPaths: '/' | '/inbox' | '/my-style' | '/api/public/google-callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/inbox' | '/api/public/google-callback'
-  id: '__root__' | '/' | '/inbox' | '/api/public/google-callback'
+  to: '/' | '/inbox' | '/my-style' | '/api/public/google-callback'
+  id: '__root__' | '/' | '/inbox' | '/my-style' | '/api/public/google-callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   InboxRoute: typeof InboxRoute
+  MyStyleRoute: typeof MyStyleRoute
   ApiPublicGoogleCallbackRoute: typeof ApiPublicGoogleCallbackRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InboxRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-style': {
+      id: '/my-style'
+      path: '/my-style'
+      fullPath: '/my-style'
+      preLoaderRoute: typeof MyStyleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/google-callback': {
       id: '/api/public/google-callback'
       path: '/api/public/google-callback'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   InboxRoute: InboxRoute,
+  MyStyleRoute: MyStyleRoute,
   ApiPublicGoogleCallbackRoute: ApiPublicGoogleCallbackRoute,
 }
 export const routeTree = rootRouteImport

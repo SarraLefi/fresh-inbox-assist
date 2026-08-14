@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Loader2, RefreshCw, Copy, Check, Send, Sparkles, LogOut, Inbox } from "lucide-react";
 import { toast } from "sonner";
 
-import { listInbox, generateReply, sendGmailReply, signOut } from "@/lib/gmail.functions";
+import { listInbox, generateReply, sendGmailReply, signOut, getWritingSamples } from "@/lib/gmail.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -67,6 +67,9 @@ function InboxPage() {
     refetchInterval: 120_000,
   });
 
+  const fetchSamples = useServerFn(getWritingSamples);
+  const { data: samples } = useQuery({ queryKey: ["writing_samples"], queryFn: () => fetchSamples() });
+
   useEffect(() => {
     if (data && !data.connected) navigate({ to: "/" });
   }, [data, navigate]);
@@ -118,6 +121,14 @@ function InboxPage() {
           <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
             {(error as Error).message}
           </p>
+        )}
+        {samples && samples.length === 0 && (
+          <div className="mb-4 rounded-md border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+            Ajoute des exemples de ton style pour des réponses plus personnalisées →{' '}
+            <button className="underline" onClick={() => navigate({ to: '/my-style' })}>
+              Mon style d'écriture
+            </button>
+          </div>
         )}
         {isLoading && (
           <div className="flex items-center gap-2 py-12 text-sm text-muted-foreground">

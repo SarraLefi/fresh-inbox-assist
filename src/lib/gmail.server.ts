@@ -1,5 +1,24 @@
 import { createClient } from "@supabase/supabase-js";
 
+// In development, attempt to load a local .env so process.env values are available
+// when running `npm run dev` from the project root. This makes it easier to
+// test OAuth locally without having to export env vars in the shell.
+if (process.env.NODE_ENV !== "production" && !process.env["GOOGLE_OAUTH_CLIENT_ID"]) {
+  try {
+    // dynamic import so this only runs in dev and doesn't affect production bundles
+    // top-level await is supported in the dev environment used by Vite.
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      try {
+        const dotenv = await import("dotenv");
+        dotenv.config();
+        // eslint-disable-next-line no-console
+        console.log("[auth] loaded .env for development");
+      } catch {}
+    })();
+  } catch {}
+}
+
 export type GmailAccount = {
   id: string;
   email: string;
@@ -41,6 +60,12 @@ export function buildAuthUrl(origin: string, state: string) {
     prompt: "consent",
     state,
   });
+  const redirect = callbackUrl(origin);
+  // Temporary debug log to help diagnose invalid_client errors (safe to log client id)
+  try {
+    // eslint-disable-next-line no-console
+    console.log(`[auth] buildAuthUrl client_id=${process.env["GOOGLE_OAUTH_CLIENT_ID"] ?? "<missing>"} redirect_uri=${redirect}`);
+  } catch {}
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
 
@@ -311,6 +336,76 @@ export async function generateWithGroq(emailContent: string) {
       ],
     }),
   });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Groq [${res.status}]: ${text}`);
+  const json = JSON.parse(text) as { choices?: { message?: { content?: string } }[] };
+  return json.choices?.[0]?.message?.content?.trim() ?? "";
+}
+
+export async function getWritingSamples(userId: string) {
+  const db = admin();
+  const { data, error } = await db
+    .from("writing_samples")
+    .select("subject, body, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true })
+    .limit(3);
+  if (error) throw error;
+  return (data ?? []) as { subject: string; body: string; created_at: string }[];
+}
+
+export async function replaceWritingSamples(userId: string, samples: { subject: string; body: string }[]) {
+  const db = admin();
+  // Delete existing samples for user
+  const { error: delError } = await db.from("writing_samples").delete().eq("user_id", userId);
+  if (delError) throw delError;
+  if (samples.length === 0) return;
+  const rows = samples.map((s) => ({ user_id: userId, subject: s.subject, body: s.body, created_at: new Date().toISOString() }));
+  const { error } = await db.from("writing_samples").insert(rows);
+  if (error) throw error;
+}
+
+export async function generateWithGroqWithStyle(emailContent: string, userId?: string) {
+  // Build prompt including up to 3 examples if available
+  let examplesText = "";
+  if (userId) {
+    try {
+      const samples = await getWritingSamples(userId);
+      if (samples.length > 0) {
+        const parts: string[] = [];
+        samples.slice(0, 3).forEach((s, i) => {
+          parts.push(`Exemple ${i + 1} :\nObjet : ${s.subject}\n${s.body}`);
+        });
+        examplesText = `Voici ${samples.length} exemple(s) d'emails que j'ai déjà écrits, pour que tu comprennes mon style :\n\n${parts.join("\n\n")}\n\n---\n\n`;
+      }
+    } catch (e) {
+      // ignore and fall back to default prompt
+      examplesText = "";
+    }
+  }
+
+  const prompt = examplesText
+    ? `${examplesText}En t'inspirant précisément de ce style (longueur des phrases, niveau de formalité, façon de saluer et de conclure, vocabulaire employé), rédige une réponse à cet email reçu :\n\n${emailContent}\n\nRègles :\n- Reproduis exactement mon niveau de tutoiement/vouvoiement\n- Garde une longueur de réponse cohérente avec mes exemples\n- Utilise les mêmes formules de salutation/conclusion que dans mes exemples si possible\n- Ne mets aucune formule d'introduction du type 'Voici une proposition'\n- Donne directement le texte de l'email prêt à être envoyé`
+    : `Rédige une proposition de réponse professionnelle et concise en français (max 150 mots) à cet email : ${emailContent}`;
+
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env["GROQ_API_KEY"]}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",
+      temperature: 0.7,
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    }),
+  });
+
   const text = await res.text();
   if (!res.ok) throw new Error(`Groq [${res.status}]: ${text}`);
   const json = JSON.parse(text) as { choices?: { message?: { content?: string } }[] };
