@@ -39,34 +39,7 @@ export default function Chatbot() {
     }
   };
 
-  const Placeholder = () => (
-    <div>
-      <div className="fixed right-6 bottom-20 z-[9999]">
-        {!open ? (
-          <Button onClick={() => setOpen(true)} className="flex items-center gap-2">
-            <MessagesSquare className="size-4" />
-          </Button>
-        ) : (
-          <div className="w-80 rounded-2xl border border-border bg-surface shadow-lg">
-            <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2">
-              <div className="flex items-center gap-2">
-                <MessagesSquare className="size-4 text-primary" />
-                <div className="text-sm font-medium">Assistant (déconnecté)</div>
-              </div>
-              <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Fermer">
-                <X className="size-4" />
-              </Button>
-            </div>
-            <div className="p-3 text-sm">
-              <div className="text-xs text-muted-foreground">Connectez-vous pour utiliser l'assistant.</div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  if (!connected) return <Placeholder />;
+  if (!connected) return null;
 
   return (
     <div>
