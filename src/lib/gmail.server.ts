@@ -244,7 +244,7 @@ function encodeRaw(input: string) {
   return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-export async function createGmailDraft(
+export async function sendGmailMessage(
   account: GmailAccount,
   params: { to: string; subject: string; body: string; threadId?: string | undefined },
 ) {
@@ -260,13 +260,11 @@ export async function createGmailDraft(
     params.body,
   ].join("\r\n");
 
-  const draft = (await gmail(account, "/drafts", {
+  const sent = (await gmail(account, "/messages/send", {
     method: "POST",
-    body: JSON.stringify({
-      message: { raw: encodeRaw(mime), threadId: params.threadId },
-    }),
+    body: JSON.stringify({ raw: encodeRaw(mime), threadId: params.threadId }),
   })) as { id: string };
-  return draft.id;
+  return sent.id;
 }
 
 export async function storeDraft(params: {

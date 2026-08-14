@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Loader2, RefreshCw, Copy, Check, Save, Sparkles, LogOut, Inbox } from "lucide-react";
 import { toast } from "sonner";
 
-import { listInbox, generateReply, saveGmailDraft, signOut } from "@/lib/gmail.functions";
+import { listInbox, generateReply, sendGmailReply, signOut } from "@/lib/gmail.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -141,10 +141,10 @@ function InboxPage() {
 
 function EmailCard({ email }: { email: Email }) {
   const generate = useServerFn(generateReply);
-  const saveDraft = useServerFn(saveGmailDraft);
+  const sendReply = useServerFn(sendGmailReply);
   const [draft, setDraft] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [sending, setSending] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const senderName = email.from.replace(/<[^>]+>/, "").replace(/"/g, "").trim() || email.fromEmail;
@@ -176,11 +176,11 @@ function EmailCard({ email }: { email: Email }) {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const onSave = async () => {
+  const onSend = async () => {
     if (!draft) return;
-    setSaving(true);
+    setSending(true);
     try {
-      await saveDraft({
+      await sendReply({
         data: {
           messageId: email.id,
           threadId: email.threadId,
@@ -189,11 +189,11 @@ function EmailCard({ email }: { email: Email }) {
           body: draft,
         },
       });
-      toast.success("Brouillon enregistré dans Gmail");
+      toast.success("Réponse envoyée");
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
-      setSaving(false);
+      setSending(false);
     }
   };
 
@@ -248,9 +248,9 @@ function EmailCard({ email }: { email: Email }) {
                   {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
                   {copied ? "Copié" : "Copier"}
                 </Button>
-                <Button size="sm" onClick={onSave} disabled={saving}>
-                  {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-                  Sauvegarder comme brouillon Gmail
+                <Button size="sm" onClick={onSend} disabled={sending}>
+                  {sending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+                  Envoyer la réponse
                 </Button>
                 <Button size="sm" variant="ghost" onClick={onGenerate} disabled={busy}>
                   Regénérer
